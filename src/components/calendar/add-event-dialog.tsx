@@ -80,11 +80,13 @@ export function AddEventDialog({ open, onOpenChange, defaultDate, onSuccess }: A
             const end = new Date(defaultDate)
             end.setHours(start.getHours() + 1)
 
+            const pad = (n: number) => String(n).padStart(2, '0')
+            const toLocal = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
             form.reset({
                 title: "鋼琴課",
-                start_at: start.toISOString().slice(0, 16), // datetime-local format
-                end_at: end.toISOString().slice(0, 16),
-                teacher_id: "placeholder" // Will act as current user
+                start_at: toLocal(start),
+                end_at: toLocal(end),
+                teacher_id: "placeholder"
             })
         }
     }, [defaultDate, form])

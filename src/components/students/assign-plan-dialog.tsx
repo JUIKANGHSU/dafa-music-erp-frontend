@@ -178,9 +178,7 @@ export function AssignPlanDialog({ studentId, studentName, trigger }: AssignPlan
                 const newPackage = packagesRes.data[0]
 
                 if (newPackage) {
-                    // Send local ISO string (YYYY-MM-DDTHH:mm:ss) to avoid UTC conversion shifts
-                    // This ensures 15:00 user time is stored as 15:00 and displayed as 15:00
-                    const startDateTime = `${values.start_date}T${values.start_time}:00`
+                    const startDateTime = new Date(`${values.start_date}T${values.start_time}:00`).toISOString()
                     await axios.post(`/api/students/${studentId}/schedule`, {
                         lesson_package_id: newPackage.id,
                         teacher_id: values.teacher_id,
