@@ -41,10 +41,12 @@ export function LoginForm() {
         },
     })
 
-    // Clear token on mount to ensure clean slate
+    // Redirect to dashboard if already logged in
     React.useEffect(() => {
-        localStorage.removeItem("token")
-    }, [])
+        if (localStorage.getItem("token")) {
+            router.replace("/")
+        }
+    }, [router])
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setIsLoading(true)
