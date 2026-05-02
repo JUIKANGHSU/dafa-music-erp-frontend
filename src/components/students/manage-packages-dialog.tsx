@@ -207,113 +207,90 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                     <Button variant="ghost" size="sm">Manage Courses</Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px]">
+            <DialogContent className="w-[95vw] max-w-lg max-h-[85vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>Manage Courses - {studentName}</DialogTitle>
-                    <DialogDescription>
-                        View and edit existing course packages.
-                    </DialogDescription>
+                    <DialogTitle>{studentName} 的課程管理</DialogTitle>
                 </DialogHeader>
 
-                <div className="py-4">
+                <div className="py-2 space-y-3">
                     {loading ? (
                         <div className="flex justify-center p-4">
                             <Loader2 className="h-6 w-6 animate-spin" />
                         </div>
+                    ) : packages.length === 0 ? (
+                        <p className="text-center text-sm text-zinc-400 py-8">尚無課程包</p>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Start Date</TableHead>
-                                    <TableHead>Total Lessons</TableHead>
-                                    <TableHead>Used</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="w-[150px]">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {packages.map((pkg) => {
-                                    const isEditing = editingId === pkg.id
-                                    return (
-                                        <TableRow key={pkg.id}>
-                                            <TableCell>
-                                                {isEditing ? (
-                                                    <Input
-                                                        type="date"
-                                                        value={editValues.start_date || ""}
-                                                        onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })}
-                                                    />
-                                                ) : pkg.start_date}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing ? (
-                                                    <Input
-                                                        type="number"
-                                                        value={editValues.total_lessons}
-                                                        onChange={(e) => setEditValues({ ...editValues, total_lessons: parseInt(e.target.value) })}
-                                                    />
-                                                ) : pkg.total_lessons}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing ? (
-                                                    <Input
-                                                        type="number"
-                                                        value={editValues.used_lessons}
-                                                        onChange={(e) => setEditValues({ ...editValues, used_lessons: parseInt(e.target.value) })}
-                                                    />
-                                                ) : pkg.used_lessons}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing ? (
-                                                    <Select
-                                                        value={editValues.status}
-                                                        onValueChange={(val) => setEditValues({ ...editValues, status: val })}
-                                                    >
-                                                        <SelectTrigger className="w-[100px]">
-                                                            <SelectValue />
-                                                        </SelectTrigger>
+                        packages.map((pkg) => {
+                            const isEditing = editingId === pkg.id
+                            const remaining = pkg.total_lessons - pkg.used_lessons
+                            return (
+                                <div key={pkg.id} className="rounded-xl border bg-white p-4 shadow-sm space-y-3">
+                                    {isEditing ? (
+                                        <div className="space-y-3">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <p className="text-xs text-zinc-500 mb-1">開始日期</p>
+                                                    <Input type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-zinc-500 mb-1">狀態</p>
+                                                    <Select value={editValues.status} onValueChange={(val) => setEditValues({ ...editValues, status: val })}>
+                                                        <SelectTrigger><SelectValue /></SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="active">Active</SelectItem>
-                                                            <SelectItem value="finished">Finished</SelectItem>
-                                                            <SelectItem value="expired">Expired</SelectItem>
-                                                            <SelectItem value="void">Void</SelectItem>
+                                                            <SelectItem value="active">啟用</SelectItem>
+                                                            <SelectItem value="finished">完成</SelectItem>
+                                                            <SelectItem value="expired">過期</SelectItem>
+                                                            <SelectItem value="void">作廢</SelectItem>
                                                         </SelectContent>
                                                     </Select>
-                                                ) : (
-                                                    <span className={`capitalize ${pkg.status === 'active' ? 'text-green-600 font-bold' : 'text-gray-500'}`}>
-                                                        {pkg.status}
-                                                    </span>
-                                                )}
-                                            </TableCell>
-                                            <TableCell>
-                                                {isEditing ? (
-                                                    <div className="flex space-x-2">
-                                                        <Button size="icon" variant="ghost" onClick={() => saveEdit(pkg.id)}>
-                                                            <Check className="h-4 w-4 text-green-600" />
-                                                        </Button>
-                                                        <Button size="icon" variant="ghost" onClick={cancelEdit}>
-                                                            <X className="h-4 w-4 text-red-600" />
-                                                        </Button>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex space-x-1">
-                                                        <Button size="icon" variant="ghost" onClick={() => startEdit(pkg)} title="編輯">
-                                                            <Edit2 className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button size="icon" variant="ghost" onClick={() => openScheduleDialog(pkg.id)} title="排課">
-                                                            <CalendarPlus className="h-4 w-4 text-blue-600" />
-                                                        </Button>
-                                                        <Button size="icon" variant="ghost" onClick={() => deletePackage(pkg.id)} title="刪除">
-                                                            <Trash2 className="h-4 w-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <p className="text-xs text-zinc-500 mb-1">總堂數</p>
+                                                    <Input type="number" value={editValues.total_lessons} onChange={(e) => setEditValues({ ...editValues, total_lessons: parseInt(e.target.value) })} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs text-zinc-500 mb-1">已用堂數</p>
+                                                    <Input type="number" value={editValues.used_lessons} onChange={(e) => setEditValues({ ...editValues, used_lessons: parseInt(e.target.value) })} />
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button className="flex-1" size="sm" onClick={() => saveEdit(pkg.id)}>
+                                                    <Check className="h-4 w-4 mr-1" /> 儲存
+                                                </Button>
+                                                <Button className="flex-1" size="sm" variant="outline" onClick={cancelEdit}>
+                                                    <X className="h-4 w-4 mr-1" /> 取消
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-center justify-between">
+                                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${pkg.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                                                    {pkg.status === 'active' ? '啟用' : pkg.status === 'finished' ? '完成' : pkg.status === 'expired' ? '過期' : '作廢'}
+                                                </span>
+                                                <span className={`text-sm font-bold ${remaining <= 3 ? 'text-red-500' : 'text-emerald-600'}`}>
+                                                    剩 {remaining} / {pkg.total_lessons} 堂
+                                                </span>
+                                            </div>
+                                            <div className="text-xs text-zinc-500">開始日期：{pkg.start_date}</div>
+                                            <div className="flex gap-2 pt-1">
+                                                <Button size="sm" variant="outline" className="flex-1" onClick={() => startEdit(pkg)}>
+                                                    <Edit2 className="h-3.5 w-3.5 mr-1" /> 編輯
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="flex-1" onClick={() => openScheduleDialog(pkg.id)}>
+                                                    <CalendarPlus className="h-3.5 w-3.5 mr-1 text-blue-600" /> 排課
+                                                </Button>
+                                                <Button size="sm" variant="outline" className="text-red-500 border-red-200" onClick={() => deletePackage(pkg.id)}>
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            )
+                        })
                     )}
                 </div>
             </DialogContent>
