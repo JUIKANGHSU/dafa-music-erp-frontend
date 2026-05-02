@@ -234,7 +234,7 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">開始日期</p>
-                                                    <Input className="text-sm h-8 px-2" type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
+                                                    <Input className="text-xs h-8 w-full px-1" type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">狀態</p>
