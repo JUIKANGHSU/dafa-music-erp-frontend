@@ -104,9 +104,24 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                 headers: { Authorization: `Bearer ${token}` }
             })
             setEditingId(null)
-            fetchPackages() // Refresh
+            fetchPackages()
         } catch (err) {
             alert("Failed to update package")
+            console.error(err)
+        }
+    }
+
+    const deletePackage = async (pkgId: string) => {
+        if (!confirm("確定要刪除這個課程包？相關的課程排程也會一併刪除。")) return
+        try {
+            const { default: axios } = await import("axios")
+            const token = localStorage.getItem("token")
+            await axios.delete(`/api/students/${studentId}/packages/${pkgId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            fetchPackages()
+        } catch (err) {
+            alert("刪除失敗")
             console.error(err)
         }
     }
@@ -156,8 +171,7 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
         // Combine date and time
         // Frontend input type="date" gives YYYY-MM-DD
         // input type="time" gives HH:MM
-        // Send local ISO string (YYYY-MM-DDTHH:mm:ss) to avoid UTC conversion shifts
-        const startDateTime = `${scheduleData.startDate}T${scheduleData.startTime}:00`
+        const startDateTime = new Date(`${scheduleData.startDate}T${scheduleData.startTime}:00`).toISOString()
 
         try {
             const { default: axios } = await import("axios")
@@ -283,11 +297,14 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                                     </div>
                                                 ) : (
                                                     <div className="flex space-x-1">
-                                                        <Button size="icon" variant="ghost" onClick={() => startEdit(pkg)} title="Edit Package">
+                                                        <Button size="icon" variant="ghost" onClick={() => startEdit(pkg)} title="編輯">
                                                             <Edit2 className="h-4 w-4" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" onClick={() => openScheduleDialog(pkg.id)} title="Schedule Lessons">
+                                                        <Button size="icon" variant="ghost" onClick={() => openScheduleDialog(pkg.id)} title="排課">
                                                             <CalendarPlus className="h-4 w-4 text-blue-600" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" onClick={() => deletePackage(pkg.id)} title="刪除">
+                                                            <Trash2 className="h-4 w-4 text-red-500" />
                                                         </Button>
                                                     </div>
                                                 )}
