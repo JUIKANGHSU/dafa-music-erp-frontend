@@ -234,7 +234,7 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">開始日期</p>
-                                                    <input className="appearance-none w-full rounded-md border border-input bg-background px-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring" style={{ height: '32px' }} type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
+                                                    <input className="appearance-none w-full rounded-md border border-input bg-background px-2 text-xs focus:outline-none focus:ring-1 focus:ring-ring" style={{ height: '32px', textAlign: 'left' }} type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">狀態</p>
@@ -248,8 +248,6 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">總堂數</p>
                                                     <Input className="!h-8 text-sm px-2" type="number" value={editValues.total_lessons} onChange={(e) => setEditValues({ ...editValues, total_lessons: parseInt(e.target.value) })} />
