@@ -35,6 +35,7 @@ import {
 interface Package {
     id: string
     student_id: string
+    teacher_id?: string
     total_lessons: number
     used_lessons: number
     start_date: string
@@ -78,17 +79,20 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
     useEffect(() => {
         if (open) {
             fetchPackages()
+            fetchTeachers()
         }
     }, [open, studentId])
 
     const startEdit = (pkg: Package) => {
         setEditingId(pkg.id)
         setEditValues({
+            teacher_id: pkg.teacher_id,
             total_lessons: pkg.total_lessons,
             used_lessons: pkg.used_lessons,
             start_date: pkg.start_date,
             status: pkg.status
         })
+        fetchTeachers()
     }
 
     const cancelEdit = () => {
@@ -226,16 +230,16 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                             return (
                                 <div key={pkg.id} className="rounded-xl border bg-white p-4 shadow-sm space-y-3">
                                     {isEditing ? (
-                                        <div className="space-y-3">
+                                        <div className="space-y-2">
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">開始日期</p>
-                                                    <Input type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
+                                                    <Input className="text-sm h-8 px-2" type="date" value={editValues.start_date || ""} onChange={(e) => setEditValues({ ...editValues, start_date: e.target.value })} />
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">狀態</p>
                                                     <Select value={editValues.status} onValueChange={(val) => setEditValues({ ...editValues, status: val })}>
-                                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                                        <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
                                                         <SelectContent>
                                                             <SelectItem value="active">啟用</SelectItem>
                                                             <SelectItem value="finished">完成</SelectItem>
@@ -248,14 +252,26 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">總堂數</p>
-                                                    <Input type="number" value={editValues.total_lessons} onChange={(e) => setEditValues({ ...editValues, total_lessons: parseInt(e.target.value) })} />
+                                                    <Input className="text-sm h-8 px-2" type="number" value={editValues.total_lessons} onChange={(e) => setEditValues({ ...editValues, total_lessons: parseInt(e.target.value) })} />
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-zinc-500 mb-1">已用堂數</p>
-                                                    <Input type="number" value={editValues.used_lessons} onChange={(e) => setEditValues({ ...editValues, used_lessons: parseInt(e.target.value) })} />
+                                                    <Input className="text-sm h-8 px-2" type="number" value={editValues.used_lessons} onChange={(e) => setEditValues({ ...editValues, used_lessons: parseInt(e.target.value) })} />
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div>
+                                                <p className="text-xs text-zinc-500 mb-1">老師</p>
+                                                <Select value={editValues.teacher_id || "none"} onValueChange={(val) => setEditValues({ ...editValues, teacher_id: val === "none" ? undefined : val })}>
+                                                    <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="選擇老師" /></SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="none">未指定</SelectItem>
+                                                        {teachers.map(t => (
+                                                            <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                            <div className="flex gap-2 pt-1">
                                                 <Button className="flex-1" size="sm" onClick={() => saveEdit(pkg.id)}>
                                                     <Check className="h-4 w-4 mr-1" /> 儲存
                                                 </Button>
@@ -275,6 +291,9 @@ export function ManagePackagesDialog({ studentId, studentName, trigger }: Manage
                                                 </span>
                                             </div>
                                             <div className="text-xs text-zinc-500">開始日期：{pkg.start_date}</div>
+                                            {pkg.teacher_id && (
+                                                <div className="text-xs text-zinc-500">老師：{teachers.find(t => t.id === pkg.teacher_id)?.name || pkg.teacher_id}</div>
+                                            )}
                                             <div className="flex gap-2 pt-1">
                                                 <Button size="sm" variant="outline" className="flex-1" onClick={() => startEdit(pkg)}>
                                                     <Edit2 className="h-3.5 w-3.5 mr-1" /> 編輯
